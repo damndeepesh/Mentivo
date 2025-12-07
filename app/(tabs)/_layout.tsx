@@ -1,35 +1,32 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { TabBar } from '@/components/ui/TabBar';
+import { Colors } from '@/constants/Colors';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { withLayoutContext } from 'expo-router';
+import { View } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+const { Navigator } = createMaterialTopTabNavigator();
+
+export const MaterialTopTabs = withLayoutContext(Navigator);
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useThemeStore();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+    <View style={{ flex: 1, backgroundColor: theme === 'dark' ? Colors.dark.background : Colors.oceanCalm.background }}>
+      <MaterialTopTabs
+        // @ts-ignore
+        tabBar={(props) => <TabBar {...props} />}
+        tabBarPosition="bottom"
+        screenOptions={{
+          headerShown: false,
+          swipeEnabled: true,
+          animationEnabled: true,
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <MaterialTopTabs.Screen name="index" />
+        <MaterialTopTabs.Screen name="stats" />
+      </MaterialTopTabs>
+    </View>
   );
 }
