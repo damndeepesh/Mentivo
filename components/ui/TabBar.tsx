@@ -6,12 +6,15 @@ import { Home, LineChart, Plus } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { theme } = useThemeStore();
+    const { bottom } = useSafeAreaInsets();
     const colors = theme === 'dark' ? Colors.dark : Colors.oceanCalm;
 
     return (
-        <View style={[styles.container, styles.shadow]}>
+        <View style={[styles.container, styles.shadow, { bottom: 40 + bottom }]}>
             <BlurView
                 intensity={80}
                 tint={theme === 'dark' ? 'dark' : 'extraLight'}
@@ -87,7 +90,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 40,
+        // bottom: 40, // Removing static bottom
         left: 80,
         right: 80,
         alignItems: 'center',
