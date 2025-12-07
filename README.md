@@ -1,50 +1,54 @@
-# Welcome to your Expo app 👋
+# Mentivo 🌿
+> Your offline-first personal journal and mood tracker.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mentivo is a beautiful, private, and intuitive journaling application designed to help you track your thoughts and emotions. With a focus on aesthetics and simplicity, it provides deep insights into your mental well-being through visual data like the "Year in Pixels" heatmap.
 
-## Get started
+## Features ✨
 
-1. Install dependencies
+- **📝 Rich Journaling**: Write daily entries with ease using a clean distraction-free editor.
+- **🎭 Mood Tracking**: Select from 17+ distinct moods (Happy, Calm, Grateful, Anxious, etc.) with a beautiful animated carousel.
+- **📊 Year in Pixels**: A stunning Github-style heatmap that visualizes your emotional journey over the entire year.
+- **📈 Stats & Insights**: View your dominant monthly mood and a percentage breakdown of your feelings.
+- **🌓 Smart Theming**: 
+    - **Light Mode**: Lively, candy-colored pastels for a bright day.
+    - **Dark Mode**: Sophisticated, deep jewel tones for a restful night.
+- **📅 Timeline Feed**: Your history organization by date with collapsible groups (Today, Yesterday, etc.).
+- **🔐 Privacy First**: 100% offline. Your data lives on your device (AsyncStorage).
+- **💨 Fluid Navigation**: Native swipe gestures between your Feed and Stats.
 
+## Tech Stack 🛠️
+
+- **Framework**: React Native (Expo SDK 54)
+- **Routing**: Expo Router (File-based routing)
+- **State Management**: Zustand
+- **Animations**: React Native Reanimated 4 & LayoutAnimation
+- **Icons**: Lucide React Native
+- **Storage**: AsyncStorage
+- **Date Handling**: date-fns
+- **UI**: Custom components with Glassmorphism (`expo-blur`)
+
+## Installation 📦
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/damndeepesh/Mentivo.git
+   cd Mentivo
+   ```
+
+2. **Install dependencies**:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Run the app**:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Contributing 🤝
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Contributions are welcome! Feel free to submit a Pull Request.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## License 📄
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under the MIT License.
