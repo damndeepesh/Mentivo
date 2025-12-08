@@ -1,5 +1,6 @@
 import { PixelYear } from '@/components/ui/PixelYear';
 import { Colors } from '@/constants/Colors';
+import { SENTIMENT_DICTIONARY } from '@/constants/SentimentDictionary';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { addMonths, format, isAfter, isBefore, isSameMonth, startOfMonth, subMonths } from 'date-fns';
@@ -39,14 +40,70 @@ export default function StatsScreen() {
     const canGoBack = isAfter(startOfMonth(currentMonth), startOfMonth(earliestDate));
     const canGoForward = isBefore(startOfMonth(currentMonth), startOfMonth(now));
 
-    // Calculate dominant mood
+    // Calculate Monthly Vibe (Average)
+    const moodWeights: Record<string, number> = {
+        excited: 5,
+        happy: 4, grateful: 4, loving: 4, proud: 4,
+        hopeful: 3, confident: 3,
+        calm: 1,
+        perplexed: 0,
+        bored: -1, tired: -1,
+        anxious: -2, sad: -2,
+        lonely: -3, jealous: -3, frustrated: -3,
+        angry: -4
+    };
+
+    // Calculate average score
+    let totalScore = 0;
+    let totalDataPoints = 0;
+
+    if (filteredEntries.length > 0) {
+        totalScore = filteredEntries.reduce((sum, entry) => {
+            let entryScore = moodWeights[entry.mood] || 0;
+            let entryPoints = 1; // The mood itself is 1 data point
+
+            // Scan for keywords
+            if (entry.text) {
+                // Split by non-word characters to get clean tokens
+                const words = entry.text.toLowerCase().split(/[^a-z0-9]+/);
+                for (const word of words) {
+                    if (word && SENTIMENT_DICTIONARY[word] !== undefined) {
+                        entryScore += SENTIMENT_DICTIONARY[word];
+                        entryPoints += 1;
+                    }
+                }
+            }
+
+            totalDataPoints += entryPoints;
+            return sum + entryScore;
+        }, 0);
+    }
+    const averageScore = totalDataPoints > 0 ? totalScore / totalDataPoints : 0;
+
+    // Find closest mood to average
+    // We can also just display the mood that matches the rounded average if we want to be strict,
+    // or find the *closest* weight.
+    const sortedMoodsByWeight = Object.entries(moodWeights).sort((a, b) => a[1] - b[1]);
+
+    // Find closest mood
+    let monthlyVibe = '';
+    let minDiff = Infinity;
+
+    if (filteredEntries.length > 0) {
+        for (const [mood, weight] of sortedMoodsByWeight) {
+            const diff = Math.abs(weight - averageScore);
+            if (diff < minDiff) {
+                minDiff = diff;
+                monthlyVibe = mood;
+            }
+        }
+    }
+
+    // Secondary stat: dominant mood percentage for breakdown
     const moodCounts = filteredEntries.reduce((acc, entry) => {
         acc[entry.mood] = (acc[entry.mood] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
-
-    const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-    const percentage = dominantMood ? Math.round((moodCounts[dominantMood] / filteredEntries.length) * 100) : 0;
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -77,19 +134,32 @@ export default function StatsScreen() {
                 <View style={styles.sectionContainer}>
                     <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Monthly Vibe</Text>
                     <View style={[styles.moodSummaryCard, { backgroundColor: theme === 'dark' ? '#333' : '#fff' }]}>
-                        {dominantMood ? (
+                        {monthlyVibe ? (
                             <>
                                 <View style={[styles.moodIconLarge, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
                                     <Text style={{ fontSize: 40 }}>
-                                        {dominantMood === 'happy' ? '😊' :
-                                            dominantMood === 'calm' ? '😌' :
-                                                dominantMood === 'excited' ? '🤩' :
-                                                    dominantMood === 'grateful' ? '🥰' : '✨'}
+                                        {monthlyVibe === 'happy' ? '😊' :
+                                            monthlyVibe === 'calm' ? '😌' :
+                                                monthlyVibe === 'excited' ? '🤩' :
+                                                    monthlyVibe === 'grateful' ? '🥰' :
+                                                        monthlyVibe === 'confident' ? '😎' :
+                                                            monthlyVibe === 'loving' ? '😍' :
+                                                                monthlyVibe === 'proud' ? '🦁' :
+                                                                    monthlyVibe === 'hopeful' ? '🌈' :
+                                                                        monthlyVibe === 'tired' ? '😴' :
+                                                                            monthlyVibe === 'perplexed' ? '🤔' :
+                                                                                monthlyVibe === 'anxious' ? '😰' :
+                                                                                    monthlyVibe === 'jealous' ? '😒' :
+                                                                                        monthlyVibe === 'sad' ? '😔' :
+                                                                                            monthlyVibe === 'bored' ? '😐' :
+                                                                                                monthlyVibe === 'frustrated' ? '😤' :
+                                                                                                    monthlyVibe === 'lonely' ? '🌧️' :
+                                                                                                        monthlyVibe === 'angry' ? '😡' : '✨'}
                                     </Text>
                                 </View>
                                 <View>
-                                    <Text style={[styles.moodTitle, { color: colors.text }]}>{dominantMood.charAt(0).toUpperCase() + dominantMood.slice(1)}</Text>
-                                    <Text style={[styles.moodSubtitle, { color: colors.textSecondary }]}>{percentage}% of your month</Text>
+                                    <Text style={[styles.moodTitle, { color: colors.text }]}>{monthlyVibe.charAt(0).toUpperCase() + monthlyVibe.slice(1)}</Text>
+                                    <Text style={[styles.moodSubtitle, { color: colors.textSecondary }]}>Based on {filteredEntries.length} entries</Text>
                                 </View>
                             </>
                         ) : (
