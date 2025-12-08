@@ -54,31 +54,42 @@ export default function StatsScreen() {
     };
 
     // Calculate average score
+    // Calculate average score
     let totalScore = 0;
-    let totalDataPoints = 0;
+    // We count entries now, not just data points, for the final average
+    let validEntryCount = 0;
 
     if (filteredEntries.length > 0) {
         totalScore = filteredEntries.reduce((sum, entry) => {
-            let entryScore = moodWeights[entry.mood] || 0;
-            let entryPoints = 1; // The mood itself is 1 data point
+            const moodScore = moodWeights[entry.mood] || 0;
 
-            // Scan for keywords
+            // Calculate Text Sentiment Score
+            let textSentimentTotal = 0;
+            let textSentimentCount = 0;
+
             if (entry.text) {
-                // Split by non-word characters to get clean tokens
                 const words = entry.text.toLowerCase().split(/[^a-z0-9]+/);
                 for (const word of words) {
                     if (word && SENTIMENT_DICTIONARY[word] !== undefined) {
-                        entryScore += SENTIMENT_DICTIONARY[word];
-                        entryPoints += 1;
+                        textSentimentTotal += SENTIMENT_DICTIONARY[word];
+                        textSentimentCount++;
                     }
                 }
             }
 
-            totalDataPoints += entryPoints;
+            // Determine Entry Score
+            let entryScore = moodScore;
+            if (textSentimentCount > 0) {
+                const averageTextSentiment = textSentimentTotal / textSentimentCount;
+                // Average the explicit mood and the implicit text sentiment
+                entryScore = (moodScore + averageTextSentiment) / 2;
+            }
+
+            validEntryCount++;
             return sum + entryScore;
         }, 0);
     }
-    const averageScore = totalDataPoints > 0 ? totalScore / totalDataPoints : 0;
+    const averageScore = validEntryCount > 0 ? totalScore / validEntryCount : 0;
 
     // Find closest mood to average
     // We can also just display the mood that matches the rounded average if we want to be strict,
